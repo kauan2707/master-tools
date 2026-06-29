@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Master Tools</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0a0e17;
+      color: #e0e0e0;
+      padding-bottom: 85px;
+      line-height: 1.6;
+    }
+    header {
+      background: linear-gradient(135deg, #1a2338, #0f1629);
+      padding: 20px 15px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { 
+      font-size: 32px; 
+      font-weight: 800; 
+      color: #ff6600; 
+      letter-spacing: -1px; 
+    }
+
+    /* Catálogo */
+    .search-bar { padding: 15px 20px; background: #0f1629; }
+    .search-bar input {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 30px;
+      border: none;
+      background: #1e2a44;
+      color: white;
+      font-size: 16px;
+    }
+    .filters {
+      display: flex;
+      gap: 10px;
+      padding: 12px 20px;
+      overflow-x: auto;
+      background: #0f1629;
+    }
+    .filter-btn {
+      background: #1e2a44;
+      color: #ccc;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 30px;
+      white-space: nowrap;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .filter-btn.active {
+      background: #ff6600;
+      color: white;
+    }
+    .content { padding: 15px 20px; display: none; }
+    .content.active { display: block; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: #1a2338;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+      transition: all 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 25px rgba(255,102,0,0.2);
+    }
+
+    /* Perfil */
+    .profile-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    .profile-pic {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: #334155;
+      margin: 0 auto 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 45px;
+      border: 4px solid #ff6600;
+    }
+    .profile-name {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .profile-email { color: #aaa; margin-bottom: 20px; }
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      background: #1a2338;
+      border-radius: 16px;
+      padding: 18px 10px;
+      margin-bottom: 25px;
+    }
+    .stat-item { text-align: center; }
+    .stat-number { font-size: 24px; font-weight: bold; color: #ffcc66; }
+    .stat-label { font-size: 13px; color: #888; }
+
+    button {
+      background: #ff6600;
+      color: white;
+      border: none;
+      padding: 13px;
+      border-radius: 12px;
+      font-weight: 700;
+      width: 100%;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.3s;
+    }
+    button:hover { 
+      background: #ff8533; 
+      transform: scale(1.03);
+    }
+
+    /* Modais */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.9);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: #1a2338;
+      padding: 28px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 420px;
+    }
+
+    .support-option {
+      background: #25334f;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .support-option:hover {
+      background: #ff6600;
+      color: white;
+      transform: translateX(8px);
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #0f1629;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0 8px;
+      border-top: 1px solid #1e2a44;
+    }
+    .nav-item {
+      text-align: center;
+      color: #888;
+      cursor: pointer;
+      font-size: 12.5px;
+      transition: all 0.3s;
+    }
+    .nav-item.active { color: #ff6600; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">🔨 MASTER TOOLS</div>
+  </header>
+
+  <!-- Catálogo -->
+  <div class="content active" id="tab0">
+    <h2 style="margin-bottom: 10px; color: #ffcc66;">Catálogo de Ferramentas</h2>
+    <div class="search-bar">
+      <input type="text" id="search" placeholder="🔎 Buscar ferramenta...">
+    </div>
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">Todos</button>
+      <button class="filter-btn" data-filter="eletrica">Elétricas</button>
+      <button class="filter-btn" data-filter="manuais">Manuais</button>
+      <button class="filter-btn" data-filter="construcao">Construção</button>
+      <button class="filter-btn" data-filter="jardinagem">Jardinagem</button>
+    </div>
+    <div class="grid" id="catalog"></div>
+  </div>
+
+  <!-- Meus Aluguéis -->
+  <div class="content" id="tab1">
+    <h2 style="margin-bottom: 15px; color: #ffcc66;">Meus Aluguéis</h2>
+    <div id="rentals-list"></div>
+  </div>
+
+  <!-- Perfil -->
+  <div class="content" id="tab2">
+    <div class="profile-header">
+      <div class="profile-pic">👷</div>
+      <div class="profile-name" id="profile-name">João Silva</div>
+      <div class="profile-email" id="profile-email">joao@email.com</div>
+      <button onclick="editProfile()">Editar Perfil</button>
+    </div>
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-number" id="total-rentals">12</div>
+        <div class="stat-label">Aluguéis</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="active-rentals">3</div>
+        <div class="stat-label">Ativos</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">98%</div>
+        <div class="stat-label">Avaliação</div>
+      </div>
+    </div>
+    <div class="card">
+      <p><strong>Telefone:</strong> <span id="profile-phone">(11) 98765-4321</span></p>
+      <p><strong>Endereço:</strong> Rua das Ferramentas, 245 - São Paulo, SP</p>
+      <p><strong>Membro desde:</strong> Março 2025</p>
+      <p><strong>Plano:</strong> <span style="color:#ffcc66;">Premium</span></p>
+    </div>
+    <div class="card">
+      <button onclick="alert('Histórico completo em breve!')">Ver Histórico de Aluguéis</button>
+      <button onclick="alert('Configurações salvas!')">Configurações</button>
+      <button onclick="logout()" style="background:#334155;">Sair da Conta</button>
+    </div>
+  </div>
+
+  <!-- Suporte -->
+  <div class="content" id="tab3">
+    <h2 style="margin-bottom: 15px; color: #ffcc66;">Central de Suporte</h2>
+    <div class="card" style="text-align:center; padding:40px 20px;">
+      <p style="font-size:18px; margin-bottom:20px;">Como podemos ajudar?</p>
+      <button onclick="showSupportModal()">Abrir Suporte</button>
+    </div>
+  </div>
+
+  <!-- Modal Aluguel -->
+  <div class="modal" id="rentModal">
+    <div class="modal-content">
+      <h3 id="modal-title" style="color:#ffcc66; margin-bottom:8px;"></h3>
+      <p id="modal-price" style="color:#ffcc66; font-size:1.1rem; margin-bottom:20px;"></p>
+      
+      <label style="display:block; margin-bottom:8px;">Quantos dias deseja alugar?</label>
+      <input type="number" id="days" value="1" min="1" style="width:100%; padding:14px; border-radius:12px; background:#0f1629; color:white; border:none; font-size:16px;">
+      
+      <div style="display:flex; gap:12px; margin-top:25px;">
+        <button onclick="closeRentModal()" style="background:#334155; flex:1;">Cancelar</button>
+        <button onclick="confirmarAluguel()" style="flex:1;">Confirmar Reserva</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Editar Perfil -->
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <h3 style="color:#ffcc66; text-align:center; margin-bottom:20px;">Editar Perfil</h3>
+      <input type="text" id="edit-name" placeholder="Nome" value="João Silva" style="width:100%; padding:12px; margin:8px 0; border-radius:8px; background:#0f1629; color:white; border:none;"><br>
+      <input type="email" id="edit-email" placeholder="Email" value="joao@email.com" style="width:100%; padding:12px; margin:8px 0; border-radius:8px; background:#0f1629; color:white; border:none;"><br>
+      <input type="tel" id="edit-phone" placeholder="Telefone" value="(11) 98765-4321" style="width:100%; padding:12px; margin:8px 0; border-radius:8px; background:#0f1629; color:white; border:none;"><br>
+      
+      <div style="margin-top:20px; display:flex; gap:10px;">
+        <button onclick="closeEditModal()" style="background:#334155; flex:1;">Cancelar</button>
+        <button onclick="saveProfile()" style="flex:1;">Salvar Alterações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Suporte -->
+  <div class="modal" id="supportModal">
+    <div class="modal-content">
+      <h3 style="color:#ffcc66; text-align:center; margin-bottom:20px;">Suporte Master Tools</h3>
+      
+      <div class="support-option" onclick="falarWhatsApp()">
+        <span style="font-size:28px;">💬</span>
+        <div>
+          <strong>Falar no WhatsApp</strong><br>
+          <small>Resposta rápida</small>
+        </div>
+      </div>
+      <div class="support-option" onclick="ligarSuporte()">
+        <span style="font-size:28px;">📞</span>
+        <div>
+          <strong>Ligar para Suporte</strong><br>
+          <small>(11) 4002-8922</small>
+        </div>
+      </div>
+      <button onclick="closeSupportModal()" style="background:#334155; margin-top:15px; width:100%;">Fechar</button>
+    </div>
+  </div>
+
+  <!-- Barra inferior -->
+  <div class="bottom-nav">
+    <div class="nav-item active" data-tab="0">🔍<br>Catálogo</div>
+    <div class="nav-item" data-tab="1">📦<br>Aluguéis</div>
+    <div class="nav-item" data-tab="2">👤<br>Perfil</div>
+    <div class="nav-item" data-tab="3">🛟<br>Suporte</div>
+  </div>
+
+  <script>
+    const tools = [
+      {name: "Furadeira de Impacto", price: "R$ 45-65/dia", category: "eletrica"},
+      {name: "Esmerilhadeira 4½\"", price: "R$ 45-65/dia", category: "eletrica"},
+      {name: "Serra Circular", price: "R$ 65-85/dia", category: "eletrica"},
+      {name: "Parafusadeira", price: "R$ 35-55/dia", category: "eletrica"},
+      {name: "Serra Tico-Tico", price: "R$ 50-70/dia", category: "eletrica"},
+      {name: "Lixadeira Orbital", price: "R$ 40-60/dia", category: "eletrica"},
+      {name: "Martelo Demolidor", price: "R$ 90-130/dia", category: "eletrica"},
+      {name: "Serra de Esquadria", price: "R$ 80-110/dia", category: "eletrica"},
+      {name: "Solda Inversora", price: "R$ 70-95/dia", category: "eletrica"},
+      {name: "Compressora de Ar", price: "R$ 85-120/dia", category: "eletrica"},
+      {name: "Martelo de Unha", price: "R$ 10-20/dia", category: "manuais"},
+      {name: "Chave Inglesa", price: "R$ 15-25/dia", category: "manuais"},
+      {name: "Alicate Universal", price: "R$ 12-22/dia", category: "manuais"},
+      {name: "Trena 5 metros", price: "R$ 8-15/dia", category: "manuais"},
+      {name: "Nível de Bolha", price: "R$ 10-18/dia", category: "manuais"},
+      {name: "Serrote para Madeira", price: "R$ 15-25/dia", category: "manuais"},
+      {name: "Betoneira 400L", price: "R$ 80-120/dia", category: "construcao"},
+      {name: "Lavadora de Alta Pressão", price: "R$ 55-80/dia", category: "construcao"},
+      {name: "Vibrador de Concreto", price: "R$ 65-90/dia", category: "construcao"},
+      {name: "Andaime Tubular", price: "R$ 70-100/dia", category: "construcao"},
+      {name: "Cortador de Piso", price: "R$ 50-75/dia", category: "construcao"},
+      {name: "Cortador de Grama", price: "R$ 60-90/dia", category: "jardinagem"},
+      {name: "Roçadeira", price: "R$ 65-95/dia", category: "jardinagem"},
+      {name: "Soprador de Folhas", price: "R$ 45-70/dia", category: "jardinagem"},
+      {name: "Motosserra", price: "R$ 75-110/dia", category: "jardinagem"},
+      {name: "Tesoura de Poda Elétrica", price: "R$ 40-65/dia", category: "jardinagem"}
+    ];
+
+    let rentals = [];
+    let currentTool = null;
+
+    // Render Catálogo
+    function renderCatalog(filteredTools) {
+      const container = document.getElementById('catalog');
+      container.innerHTML = '';
+      filteredTools.forEach(tool => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <h3>${tool.name}</h3>
+          <p style="color:#ffcc66; margin:8px 0;">${tool.price}</p>
+          <button onclick="openRentModal('${tool.name}')">Alugar Agora</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function openRentModal(toolName) {
+      currentTool = tools.find(t => t.name === toolName);
+      if (!currentTool) return;
+      
+      document.getElementById('modal-title').textContent = currentTool.name;
+      document.getElementById('modal-price').textContent = currentTool.price;
+      document.getElementById('rentModal').style.display = 'flex';
+    }
+
+    function confirmarAluguel() {
+      const days = parseInt(document.getElementById('days').value);
+      if (!days || days < 1) return alert("Informe um número válido de dias.");
+      
+      const rental = {
+        tool: currentTool.name,
+        days: days,
+        startDate: new Date().toLocaleDateString('pt-BR'),
+        endDate: new Date(Date.now() + days * 86400000).toLocaleDateString('pt-BR')
+      };
+      rentals.push(rental);
+      closeRentModal();
+      alert(`✅ Reserva confirmada!\nFerramenta: ${currentTool.name}\nDuração: ${days} dias`);
+      if (document.getElementById('tab1').classList.contains('active')) renderRentals();
+    }
+
+    function closeRentModal() {
+      document.getElementById('rentModal').style.display = 'none';
+    }
+
+    function renderRentals() {
+      const container = document.getElementById('rentals-list');
+      if (rentals.length === 0) {
+        container.innerHTML = `<p style="color:#888; text-align:center; padding:60px;">Você ainda não tem aluguéis ativos.</p>`;
+        return;
+      }
+      let html = '';
+      rentals.forEach(r => {
+        html += `<div class="card"><strong>${r.tool}</strong><br><small>${r.days} dias • ${r.startDate} até ${r.endDate}</small></div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    // Perfil
+    function editProfile() {
+      document.getElementById('editModal').style.display = 'flex';
+    }
+    function closeEditModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+    function saveProfile() {
+      const newName = document.getElementById('edit-name').value;
+      const newEmail = document.getElementById('edit-email').value;
+      const newPhone = document.getElementById('edit-phone').value;
+
+      document.getElementById('profile-name').textContent = newName;
+      document.getElementById('profile-email').textContent = newEmail;
+      document.getElementById('profile-phone').textContent = newPhone;
+
+      alert("✅ Perfil atualizado com sucesso!");
+      closeEditModal();
+    }
+
+    function logout() {
+      if (confirm("Deseja realmente sair?")) {
+        alert("👋 Você saiu da conta.");
+      }
+    }
+
+    // Suporte
+    function showSupportModal() {
+      document.getElementById('supportModal').style.display = 'flex';
+    }
+    function closeSupportModal() {
+      document.getElementById('supportModal').style.display = 'none';
+    }
+    function falarWhatsApp() {
+      alert("💬 Abrindo WhatsApp...\nNúmero: (11) 98765-4321");
+      closeSupportModal();
+    }
+    function ligarSuporte() {
+      alert("📞 Ligando para (11) 4002-8922");
+      closeSupportModal();
+    }
+
+    // Navegação
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        const tab = item.getAttribute('data-tab');
+        document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+        document.getElementById('tab' + tab).classList.add('active');
+        if (tab === '1') renderRentals();
+      });
+    });
+
+    // Filtros e Busca
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.getAttribute('data-filter');
+        const term = document.getElementById('search').value.toLowerCase();
+        let filtered = filter === "all" ? tools : tools.filter(t => t.category === filter);
+        if (term) filtered = filtered.filter(t => t.name.toLowerCase().includes(term));
+        renderCatalog(filtered);
+      });
+    });
+
+    document.getElementById('search').addEventListener('input', () => {
+      const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+      const term = document.getElementById('search').value.toLowerCase();
+      let filtered = activeFilter === "all" ? tools : tools.filter(t => t.category === activeFilter);
+      if (term) filtered = filtered.filter(t => t.name.toLowerCase().includes(term));
+      renderCatalog(filtered);
+    });
+
+    // Inicialização
+    renderCatalog(tools);
+  </script>
+</body>
+</html>
